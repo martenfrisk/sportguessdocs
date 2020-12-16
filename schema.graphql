@@ -1,0 +1,801 @@
+directive @embedded on OBJECT
+directive @collection(name: String!) on OBJECT
+directive @index(name: String!) on FIELD_DEFINITION
+directive @resolver(
+  name: String
+  paginated: Boolean! = false
+) on FIELD_DEFINITION
+directive @relation(name: String) on FIELD_DEFINITION
+directive @unique(index: String) on FIELD_DEFINITION
+scalar Date
+
+type DivisionType {
+  divisionId: String
+  # The document's ID.
+  _id: ID!
+  teams(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): TeamTypePage!
+  country: String
+  divisionName: String
+  events(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): EventPage!
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# Allow manipulating the relationship between the types 'DivisionType' and 'Event'.
+input DivisionTypeEventsRelation {
+  # Create one or more documents of type 'Event' and associate them with the current document.
+  create: [EventInput]
+  # Connect one or more documents of type 'Event' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'Event' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+# 'DivisionType' input values
+input DivisionTypeInput {
+  divisionId: String
+  divisionName: String
+  country: String
+  teams: DivisionTypeTeamsRelation
+  events: DivisionTypeEventsRelation
+}
+
+# The pagination object for elements of type 'DivisionType'.
+type DivisionTypePage {
+  # The elements of type 'DivisionType' in this page.
+  data: [DivisionType]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# Allow manipulating the relationship between the types 'DivisionType' and 'TeamType'.
+input DivisionTypeTeamsRelation {
+  # Create one or more documents of type 'TeamType' and associate them with the current document.
+  create: [TeamTypeInput]
+  # Connect one or more documents of type 'TeamType' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'TeamType' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+type Event {
+  divisionId: DivisionType
+  awayTeamName: String
+  lastUpdate: String
+  # The document's ID.
+  _id: ID!
+  finished: Boolean
+  homeTeamId: TeamType
+  dateTime: String
+  eventId: String
+  divisionName: String
+  submittedGuesses(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): UserGuessPage!
+  awayTeamId: TeamType
+  homeTeamName: String
+  venue: String
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# Allow manipulating the relationship between the types 'Event' and 'TeamType' using the field 'Event.awayTeamId'.
+input EventAwayTeamIdRelation {
+  # Create a document of type 'TeamType' and associate it with the current document.
+  create: TeamTypeInput
+  # Connect a document of type 'TeamType' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'TeamType'
+  disconnect: Boolean
+}
+
+# Allow manipulating the relationship between the types 'Event' and 'DivisionType' using the field 'Event.divisionId'.
+input EventDivisionIdRelation {
+  # Create a document of type 'DivisionType' and associate it with the current document.
+  create: DivisionTypeInput
+  # Connect a document of type 'DivisionType' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'DivisionType'
+  disconnect: Boolean
+}
+
+# Allow manipulating the relationship between the types 'Event' and 'TeamType' using the field 'Event.homeTeamId'.
+input EventHomeTeamIdRelation {
+  # Create a document of type 'TeamType' and associate it with the current document.
+  create: TeamTypeInput
+  # Connect a document of type 'TeamType' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'TeamType'
+  disconnect: Boolean
+}
+
+# 'Event' input values
+input EventInput {
+  eventId: String
+  lastUpdate: String
+  homeTeamName: String
+  awayTeamName: String
+  homeTeamId: EventHomeTeamIdRelation
+  awayTeamId: EventAwayTeamIdRelation
+  dateTime: String
+  venue: String
+  divisionId: EventDivisionIdRelation
+  divisionName: String
+  submittedGuesses: EventSubmittedGuessesRelation
+  finished: Boolean
+}
+
+# The pagination object for elements of type 'Event'.
+type EventPage {
+  # The elements of type 'Event' in this page.
+  data: [Event]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# Allow manipulating the relationship between the types 'Event' and 'UserGuess'.
+input EventSubmittedGuessesRelation {
+  # Create one or more documents of type 'UserGuess' and associate them with the current document.
+  create: [UserGuessInput]
+  # Connect one or more documents of type 'UserGuess' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'UserGuess' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+type League {
+  standings(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): StandingsPage!
+  name: String!
+  # The document's ID.
+  _id: ID!
+  slug: String!
+  options: LeagueOptions!
+  members(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): UserPage!
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# 'League' input values
+input LeagueInput {
+  name: String!
+  slug: String!
+  members: LeagueMembersRelation
+  options: LeagueOptionsRelation
+  standings: LeagueStandingsRelation
+}
+
+# Allow manipulating the relationship between the types 'League' and 'User'.
+input LeagueMembersRelation {
+  # Create one or more documents of type 'User' and associate them with the current document.
+  create: [UserInput]
+  # Connect one or more documents of type 'User' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'User' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+type LeagueOptions {
+  # The document's ID.
+  _id: ID!
+  teams: [TeamType]
+  public: Boolean
+  divisions: [String]
+  class: LeagueType
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# 'LeagueOptions' input values
+input LeagueOptionsInput {
+  class: LeagueType
+  divisions: [String]
+  teams: [ID]
+  public: Boolean
+}
+
+# Allow manipulating the relationship between the types 'League' and 'LeagueOptions' using the field 'League.options'.
+input LeagueOptionsRelation {
+  # Create a document of type 'LeagueOptions' and associate it with the current document.
+  create: LeagueOptionsInput
+  # Connect a document of type 'LeagueOptions' with the current document using its ID.
+  connect: ID
+}
+
+# The pagination object for elements of type 'League'.
+type LeaguePage {
+  # The elements of type 'League' in this page.
+  data: [League]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# Allow manipulating the relationship between the types 'League' and 'Standings'.
+input LeagueStandingsRelation {
+  # Create one or more documents of type 'Standings' and associate them with the current document.
+  create: [StandingsInput]
+  # Connect one or more documents of type 'Standings' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'Standings' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+enum LeagueType {
+  SINGLETEAM
+  SINGLEDIVISION
+  MULTITEAM
+  MULTIDIVISION
+  ANY
+}
+
+# The `Long` scalar type represents non-fractional signed whole numeric values.
+# Long can represent values between -(2^63) and 2^63 - 1.
+scalar Long
+
+type Mutation {
+  # Update an existing document in the collection of 'User'
+  updateUser(
+    # The 'User' document's ID
+    id: ID!
+    # 'User' input values
+    data: UserInput!
+  ): User
+  # Create a new document in the collection of 'User'
+  createUser(
+    # 'User' input values
+    data: UserInput!
+  ): User!
+  # Delete an existing document in the collection of 'UserGuess'
+  deleteUserGuess(
+    # The 'UserGuess' document's ID
+    id: ID!
+  ): UserGuess
+  # Create a new document in the collection of 'DivisionType'
+  createDivisionType(
+    # 'DivisionType' input values
+    data: DivisionTypeInput!
+  ): DivisionType!
+  # Delete an existing document in the collection of 'ResetRequest'
+  deleteResetRequest(
+    # The 'ResetRequest' document's ID
+    id: ID!
+  ): ResetRequest
+  # Delete an existing document in the collection of 'League'
+  deleteLeague(
+    # The 'League' document's ID
+    id: ID!
+  ): League
+  # Delete an existing document in the collection of 'TeamType'
+  deleteTeamType(
+    # The 'TeamType' document's ID
+    id: ID!
+  ): TeamType
+  # Update an existing document in the collection of 'ResetRequest'
+  updateResetRequest(
+    # The 'ResetRequest' document's ID
+    id: ID!
+    # 'ResetRequest' input values
+    data: ResetRequestInput!
+  ): ResetRequest
+  # Update an existing document in the collection of 'Event'
+  updateEvent(
+    # The 'Event' document's ID
+    id: ID!
+    # 'Event' input values
+    data: EventInput!
+  ): Event
+  # Create a new document in the collection of 'UserGuess'
+  createUserGuess(
+    # 'UserGuess' input values
+    data: UserGuessInput!
+  ): UserGuess!
+  # Update an existing document in the collection of 'DivisionType'
+  updateDivisionType(
+    # The 'DivisionType' document's ID
+    id: ID!
+    # 'DivisionType' input values
+    data: DivisionTypeInput!
+  ): DivisionType
+  # Update an existing document in the collection of 'UserGuess'
+  updateUserGuess(
+    # The 'UserGuess' document's ID
+    id: ID!
+    # 'UserGuess' input values
+    data: UserGuessInput!
+  ): UserGuess
+  # Create a new document in the collection of 'League'
+  createLeague(
+    # 'League' input values
+    data: LeagueInput!
+  ): League!
+  # Delete an existing document in the collection of 'DivisionType'
+  deleteDivisionType(
+    # The 'DivisionType' document's ID
+    id: ID!
+  ): DivisionType
+  # Update an existing document in the collection of 'League'
+  updateLeague(
+    # The 'League' document's ID
+    id: ID!
+    # 'League' input values
+    data: LeagueInput!
+  ): League
+  # Update an existing document in the collection of 'TeamType'
+  updateTeamType(
+    # The 'TeamType' document's ID
+    id: ID!
+    # 'TeamType' input values
+    data: TeamTypeInput!
+  ): TeamType
+  # Delete an existing document in the collection of 'Standings'
+  deleteStandings(
+    # The 'Standings' document's ID
+    id: ID!
+  ): Standings
+  # Delete an existing document in the collection of 'User'
+  deleteUser(
+    # The 'User' document's ID
+    id: ID!
+  ): User
+  # Delete an existing document in the collection of 'LeagueOptions'
+  deleteLeagueOptions(
+    # The 'LeagueOptions' document's ID
+    id: ID!
+  ): LeagueOptions
+  # Create a new document in the collection of 'LeagueOptions'
+  createLeagueOptions(
+    # 'LeagueOptions' input values
+    data: LeagueOptionsInput!
+  ): LeagueOptions!
+  # Create a new document in the collection of 'Event'
+  createEvent(
+    # 'Event' input values
+    data: EventInput!
+  ): Event!
+  # Create a new document in the collection of 'Standings'
+  createStandings(
+    # 'Standings' input values
+    data: StandingsInput!
+  ): Standings!
+  # Create a new document in the collection of 'TeamType'
+  createTeamType(
+    # 'TeamType' input values
+    data: TeamTypeInput!
+  ): TeamType!
+  # Create a new document in the collection of 'ResetRequest'
+  createResetRequest(
+    # 'ResetRequest' input values
+    data: ResetRequestInput!
+  ): ResetRequest!
+  # Update an existing document in the collection of 'LeagueOptions'
+  updateLeagueOptions(
+    # The 'LeagueOptions' document's ID
+    id: ID!
+    # 'LeagueOptions' input values
+    data: LeagueOptionsInput!
+  ): LeagueOptions
+  # Delete an existing document in the collection of 'Event'
+  deleteEvent(
+    # The 'Event' document's ID
+    id: ID!
+  ): Event
+  # Update an existing document in the collection of 'Standings'
+  updateStandings(
+    # The 'Standings' document's ID
+    id: ID!
+    # 'Standings' input values
+    data: StandingsInput!
+  ): Standings
+}
+
+type Query {
+  allEvents(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): EventPage!
+  # Find a document from the collection of 'ResetRequest' by its id.
+  findResetRequestByID(
+    # The 'ResetRequest' document's ID
+    id: ID!
+  ): ResetRequest
+  # Find a document from the collection of 'Event' by its id.
+  findEventByID(
+    # The 'Event' document's ID
+    id: ID!
+  ): Event
+  # Find a document from the collection of 'Standings' by its id.
+  findStandingsByID(
+    # The 'Standings' document's ID
+    id: ID!
+  ): Standings
+  allGuesses(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): UserGuessPage!
+  findGuessByUserId(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+    user: ID!
+  ): QueryFindGuessByUserIdPage!
+  # Find a document from the collection of 'UserGuess' by its id.
+  findUserGuessByID(
+    # The 'UserGuess' document's ID
+    id: ID!
+  ): UserGuess
+  allUsers(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): UserPage!
+  # Find a document from the collection of 'User' by its id.
+  findUserByID(
+    # The 'User' document's ID
+    id: ID!
+  ): User
+  # Find a document from the collection of 'TeamType' by its id.
+  findTeamTypeByID(
+    # The 'TeamType' document's ID
+    id: ID!
+  ): TeamType
+  allLeagues(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): LeaguePage!
+  # Find a document from the collection of 'League' by its id.
+  findLeagueByID(
+    # The 'League' document's ID
+    id: ID!
+  ): League
+  allTeams(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): TeamTypePage!
+  # Find a document from the collection of 'DivisionType' by its id.
+  findDivisionTypeByID(
+    # The 'DivisionType' document's ID
+    id: ID!
+  ): DivisionType
+  findLeague(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+    slug: String!
+  ): QueryFindLeaguePage!
+  # Find a document from the collection of 'LeagueOptions' by its id.
+  findLeagueOptionsByID(
+    # The 'LeagueOptions' document's ID
+    id: ID!
+  ): LeagueOptions
+}
+
+# The pagination object for elements of type 'UserGuess'.
+type QueryFindGuessByUserIdPage {
+  # The elements of type 'UserGuess' in this page.
+  data: [UserGuess]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# The pagination object for elements of type 'League'.
+type QueryFindLeaguePage {
+  # The elements of type 'League' in this page.
+  data: [League]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+type ResetRequest {
+  # The document's ID.
+  _id: ID!
+  # The document's timestamp.
+  _ts: Long!
+  email: String
+  token: String
+}
+
+# 'ResetRequest' input values
+input ResetRequestInput {
+  email: String
+  token: String
+}
+
+type Standings {
+  # The document's ID.
+  _id: ID!
+  league: League
+  points: Int
+  member: User
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# 'Standings' input values
+input StandingsInput {
+  member: StandingsMemberRelation
+  points: Int
+  league: StandingsLeagueRelation
+}
+
+# Allow manipulating the relationship between the types 'Standings' and 'League' using the field 'Standings.league'.
+input StandingsLeagueRelation {
+  # Create a document of type 'League' and associate it with the current document.
+  create: LeagueInput
+  # Connect a document of type 'League' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'League'
+  disconnect: Boolean
+}
+
+# Allow manipulating the relationship between the types 'Standings' and 'User' using the field 'Standings.member'.
+input StandingsMemberRelation {
+  # Create a document of type 'User' and associate it with the current document.
+  create: UserInput
+  # Connect a document of type 'User' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'User'
+  disconnect: Boolean
+}
+
+# The pagination object for elements of type 'Standings'.
+type StandingsPage {
+  # The elements of type 'Standings' in this page.
+  data: [Standings]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+type TeamType {
+  teamName: String
+  teamId: String
+  # The document's ID.
+  _id: ID!
+  homeEvents(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): EventPage!
+  country: String
+  division(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): DivisionTypePage!
+  inLeagues: [LeagueOptions]
+  awayEvents(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): EventPage!
+  badge: String
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# Allow manipulating the relationship between the types 'TeamType' and 'Event'.
+input TeamTypeAwayEventsRelation {
+  # Create one or more documents of type 'Event' and associate them with the current document.
+  create: [EventInput]
+  # Connect one or more documents of type 'Event' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'Event' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+# Allow manipulating the relationship between the types 'TeamType' and 'DivisionType'.
+input TeamTypeDivisionRelation {
+  # Create one or more documents of type 'DivisionType' and associate them with the current document.
+  create: [DivisionTypeInput]
+  # Connect one or more documents of type 'DivisionType' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'DivisionType' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+# Allow manipulating the relationship between the types 'TeamType' and 'Event'.
+input TeamTypeHomeEventsRelation {
+  # Create one or more documents of type 'Event' and associate them with the current document.
+  create: [EventInput]
+  # Connect one or more documents of type 'Event' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'Event' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+# 'TeamType' input values
+input TeamTypeInput {
+  teamId: String
+  teamName: String
+  division: TeamTypeDivisionRelation
+  badge: String
+  country: String
+  homeEvents: TeamTypeHomeEventsRelation
+  awayEvents: TeamTypeAwayEventsRelation
+  inLeagues: [ID]
+}
+
+# The pagination object for elements of type 'TeamType'.
+type TeamTypePage {
+  # The elements of type 'TeamType' in this page.
+  data: [TeamType]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+scalar Time
+
+type User {
+  leagues(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): LeaguePage!
+  email: String!
+  role: UserRole
+  username: String!
+  # The document's ID.
+  _id: ID!
+  guesses: [UserGuess]
+  favTeam: String
+  # The document's timestamp.
+  _ts: Long!
+}
+
+type UserGuess {
+  winner: WinnerEnum
+  # The document's ID.
+  _id: ID!
+  league: League
+  score: [String]
+  eventId: Event
+  apiEventId: String
+  corrected: Boolean
+  user: User
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# Allow manipulating the relationship between the types 'UserGuess' and 'Event' using the field 'UserGuess.eventId'.
+input UserGuessEventIdRelation {
+  # Create a document of type 'Event' and associate it with the current document.
+  create: EventInput
+  # Connect a document of type 'Event' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'Event'
+  disconnect: Boolean
+}
+
+# 'UserGuess' input values
+input UserGuessInput {
+  eventId: UserGuessEventIdRelation
+  apiEventId: String
+  user: UserGuessUserRelation
+  score: [String]
+  winner: WinnerEnum
+  league: UserGuessLeagueRelation
+  corrected: Boolean
+}
+
+# Allow manipulating the relationship between the types 'UserGuess' and 'League' using the field 'UserGuess.league'.
+input UserGuessLeagueRelation {
+  # Create a document of type 'League' and associate it with the current document.
+  create: LeagueInput
+  # Connect a document of type 'League' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'League'
+  disconnect: Boolean
+}
+
+# The pagination object for elements of type 'UserGuess'.
+type UserGuessPage {
+  # The elements of type 'UserGuess' in this page.
+  data: [UserGuess]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# Allow manipulating the relationship between the types 'UserGuess' and 'User' using the field 'UserGuess.user'.
+input UserGuessUserRelation {
+  # Create a document of type 'User' and associate it with the current document.
+  create: UserInput
+  # Connect a document of type 'User' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'User'
+  disconnect: Boolean
+}
+
+# 'User' input values
+input UserInput {
+  username: String!
+  email: String!
+  favTeam: String
+  leagues: UserLeaguesRelation
+  role: UserRole
+  guesses: [ID]
+}
+
+# Allow manipulating the relationship between the types 'User' and 'League'.
+input UserLeaguesRelation {
+  # Create one or more documents of type 'League' and associate them with the current document.
+  create: [LeagueInput]
+  # Connect one or more documents of type 'League' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'League' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+# The pagination object for elements of type 'User'.
+type UserPage {
+  # The elements of type 'User' in this page.
+  data: [User]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+enum UserRole {
+  ADMIN
+  GUEST
+  MEMBER
+}
+
+enum WinnerEnum {
+  HOMEWIN
+  DRAW
+  AWAYWIN
+}
+

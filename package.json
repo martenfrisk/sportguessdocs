@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@2fd/graphdoc": "^2.4.0",
+    "dociql": "^1.1.2"
+  }
+}
